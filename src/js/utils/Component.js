@@ -6,6 +6,7 @@ export default class Component {
     this.$props = $props;
     this.setup();
     this.render();
+    this.selectDOM();
     this.setEvent();
   }
 
@@ -20,6 +21,7 @@ export default class Component {
   }
   setEvent() {}
   setState() {}
+  selectDOM() {}
   addEvent({ eventType, selector, selectors, target, callback, isBinding }) {
     if (selector) {
       if (isBinding) {

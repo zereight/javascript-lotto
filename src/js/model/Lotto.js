@@ -22,7 +22,6 @@ export default class Lotto {
 
   static isValidLottoNumbers(winningNumbers, bonusNumber) {
     const allNumbers = [...winningNumbers, bonusNumber];
-    console.log(allNumbers);
     return (
       allNumbers.every((number) => 1 <= number && number <= 45) &&
       allNumbers.length === LOTTO_LENGTH + 1 &&

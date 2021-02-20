@@ -24,7 +24,7 @@ export default class LottoDisplay extends Component {
     )}</span></span>`;
   }
 
-  mounted() {
+  selectDOM() {
     this.totalLottoCountText = $("#total-lotto-count");
     this.lottoDisplayArea = $("#lotto-display-area");
     this.lottoNumberToggleCheckBox = $(".lotto-numbers-toggle-checkbox");

@@ -61,7 +61,7 @@ export default class ModalDisplay extends Component {
 `;
   }
 
-  mounted() {
+  selectDOM() {
     this.winnerCountTexts = $$(".winner-count");
     this.lottoProfit = $("#lotto-profit");
     this.restartButton = $("#restart-btn");

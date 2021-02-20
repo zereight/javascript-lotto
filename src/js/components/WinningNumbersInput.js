@@ -60,7 +60,7 @@ export default class WinningNumbersInput extends Component {
     this.lottos = [];
   }
 
-  mounted() {
+  selectDOM() {
     this.winningNumberInputs = $$(".winning-number");
     this.bonusNumberInput = $(".bonus-number");
     this.openResultModalButton = $(".open-result-modal-button");

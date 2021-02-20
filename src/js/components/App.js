@@ -1,6 +1,6 @@
 import Component from "../utils/Component.js";
 import LottoDisplay from "./LottoDisplay.js";
-import LottoPerchaseInput from "./LottoPerchaseInput.js";
+import LottoPurchaseInput from "./LottoPurchaseInput.js";
 import ModalDisplay from "./ModalDisplay.js";
 import WinningNumbersInput from "./WinningNumbersInput.js";
 import { $ } from "../utils/dom.js";
@@ -21,20 +21,21 @@ export default class App extends Component {
   }
 
   setup() {
+    // setInit이 낫지 않을까
     this.lottos = [];
     this.mainObserver = new Observer();
   }
 
   setObserver() {
     this.mainObserver.registerObserver(this); // App
-    this.mainObserver.registerObserver(this.LottoPerchaseInput);
+    this.mainObserver.registerObserver(this.LottoPurchaseInput);
     this.mainObserver.registerObserver(this.LottoDisplay);
     this.mainObserver.registerObserver(this.WinningNumbersInput);
     this.mainObserver.registerObserver(this.ModalDisplay);
   }
 
   mounted() {
-    this.LottoPerchaseInput = new LottoPerchaseInput(
+    this.LottoPurchaseInput = new LottoPurchaseInput(
       $("#lotto-perchase-input-container"),
       { mainObserver: this.mainObserver }
     );
@@ -52,7 +53,9 @@ export default class App extends Component {
   }
 
   notify({ lottos, restart }) {
-    this.setState({ lottos });
+    if (lottos) {
+      this.setState({ lottos });
+    }
     if (restart) {
       this.setState({ lottos: [] });
     }
