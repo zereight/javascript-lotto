@@ -3,7 +3,7 @@ import { $, $$ } from "../utils/dom.js";
 import Component from "../utils/Component.js";
 
 export default class ModalDisplay extends Component {
-  template() {
+  mainTemplate() {
     return `
         <div class="modal-inner p-10">
           <div class="modal-close">

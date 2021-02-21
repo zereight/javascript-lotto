@@ -13,16 +13,33 @@ body {
   margin: 0 auto;
 }
 
-.winning-number {
-  width: 30px;
-  height: 36px;
-}
-
-.bonus-number {
+.winning-number,
+.bonus-number,
+.manual-number {
   width: 30px;
   height: 36px;
 }
 
 .hidden {
   display: none;
+}
+
+.add-icon {
+  stroke: gray;
+  fill: transparent;
+  stroke-linecap: round;
+  stroke-width: 2;
+}
+
+#manual-lotto-add-button{
+  cursor: pointer;
+}
+
+.lotto-manual-purchase-input-container{
+  width: 100%;
+}
+
+#lotto-manual-purchase-btn{
+  width: 100%;
+  height: 200px;
 }

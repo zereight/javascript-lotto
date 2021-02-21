@@ -4,7 +4,7 @@ import Component from "../utils/Component.js";
 import Lotto from "../model/Lotto.js";
 
 export default class LottoDisplay extends Component {
-  template() {
+  mainTemplate() {
     return `<div class="d-flex">
         <label id="total-lotto-count" class="flex-auto my-0">총 5개를 구매하였습니다.</label>
         <div class="flex-auto d-flex justify-end pr-1">

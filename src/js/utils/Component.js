@@ -12,11 +12,11 @@ export default class Component {
 
   setup() {}
   mounted() {}
-  template() {
+  mainTemplate() {
     return "";
   }
   render() {
-    this.$target.innerHTML = this.template();
+    this.$target.innerHTML = this.mainTemplate();
     this.mounted();
   }
   setEvent() {}

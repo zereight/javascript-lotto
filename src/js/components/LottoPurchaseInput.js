@@ -3,13 +3,13 @@ import { $ } from "../utils/dom.js";
 import Component from "../utils/Component.js";
 
 export default class LottoPerchaseInput extends Component {
-  template() {
+  mainTemplate() {
     return `
     <div class="flex-auto d-flex justify-between pr-1">
       <label class="mb-2 d-inline-block">구입할 금액을 입력해주세요.</label>
       <label class="switch">
-            <input type="checkbox" class="lotto-purchase-type-checkbox" />
-            <span class="text-base font-normal">수동</span>
+            <input type="checkbox" class="lotto-purchase-type-checkbox" checked/>
+            <span class="text-base font-normal">자동 구매</span>
           </label>
     </div>
       <div class="d-flex">
@@ -21,13 +21,53 @@ export default class LottoPerchaseInput extends Component {
           />
         <button id="lotto-perchase-btn" type="button" class="btn btn-cyan" disabled>확인</button>
       </div>
-      
       `;
+  }
+
+  plusIconTemplate(width = 100) {
+    return `<svg width="${width}" height="${width}">
+    <line class="add-icon" x1="0" y1="${Number(
+      width / 2
+    )}" x2="${width}" y2="${Number(width / 2)}"/>
+    <line class="add-icon" x1="${Number(width / 2)}" y1="0" x2="${Number(
+      width / 2
+    )}" y2="${width}"/>
+</svg>`;
+  }
+
+  manualInputTemplate() {
+    return `<div class="lotto-manual-purchase-input mb-2">
+    <input type="number" class="manual-number mx-1 text-center"></input>
+    <input type="number" class="manual-number mx-1 text-center"></input>
+    <input type="number" class="manual-number mx-1 text-center"></input>
+    <input type="number" class="manual-number mx-1 text-center"></input>
+    <input type="number" class="manual-number mx-1 text-center"></input>
+    <input type="number" class="manual-number mx-1 text-center"></input>
+  </div>`;
+  }
+
+  manualInputAreaTemplate() {
+    return `
+    <div class="lotto-manual-purchase-input-container d-flex flex-col justify-between mt-3">
+        <div id="manual-lotto-add-button" class="d-flex justify-end">
+          <span>로또 추가</span>
+          ${this.plusIconTemplate(15)}
+        </div>
+          ${this.manualInputTemplate()}
+        <button
+          id="lotto-manual-purchase-btn"
+          type="button"
+          class="btn btn-cyan"
+          disabled
+        >
+          수동구매
+        </button>
+    </div>`;
   }
 
   setup() {
     this.purchaseInputValue = "";
-    this.isAuto = false;
+    this.isAuto = true;
   }
 
   selectDOM() {
@@ -55,10 +95,17 @@ export default class LottoPerchaseInput extends Component {
       callback: this.onClickSubmit,
       isBinding: true,
     });
+    this.addEvent({
+      eventType: "change",
+      target: this.$lottoPurchaseTypeCheckBox,
+      callback: this.onChangeCheckbox,
+      isBinding: true,
+    });
   }
 
-  setState({ purchaseInputValue }) {
+  setState({ purchaseInputValue, isAuto }) {
     this.purchaseInputValue = purchaseInputValue ?? this.purchaseInputValue;
+    this.isAuto = isAuto ?? this.isAuto;
   }
 
   onChangeInput(e) {
@@ -71,12 +118,28 @@ export default class LottoPerchaseInput extends Component {
       : (this.$lottoPurchaseButton.disabled = true);
   }
 
+  onChangeCheckbox() {
+    this.setState({ isAuto: this.$lottoPurchaseTypeCheckBox.checked });
+  }
+
   onClickSubmit() {
     this.$lottoPurchaseInput.disabled = true;
     this.$lottoPurchaseButton.disabled = true;
-    this.$props.mainObserver.notifyObservers({
-      purchaseInputValue: this.purchaseInputValue,
-    });
+    this.$lottoPurchaseTypeCheckBox.disabled = true;
+    if (this.isAuto) {
+      this.$props.mainObserver.notifyObservers({
+        purchaseInputValue: this.purchaseInputValue,
+      });
+    } else {
+      // render로 빼기
+      this.$target.innerHTML += this.manualInputAreaTemplate();
+      this.addEvent({
+        eventType: "click",
+        selector: "#manual-lotto-add-button",
+        callback: this.onAddManualLotto,
+        isBinding: true,
+      });
+    }
   }
 
   onKeyDownSubmit(e) {
@@ -87,11 +150,20 @@ export default class LottoPerchaseInput extends Component {
     this.onClickSubmit();
   }
 
+  onAddManualLotto() {
+    console.log("hi");
+    $("#manual-lotto-add-button").insertAdjacentHTML(
+      "afterend",
+      this.manualInputTemplate()
+    );
+  }
+
   notify({ restart }) {
     if (restart) {
       this.$lottoPurchaseInput.value = "";
       this.$lottoPurchaseInput.disabled = false;
       this.$lottoPurchaseButton.disabled = false;
+      this.$lottoPurchaseTypeCheckBox.disabled = false;
     }
   }
 }

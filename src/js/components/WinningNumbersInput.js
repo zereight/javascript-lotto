@@ -3,7 +3,7 @@ import Component from "../utils/Component.js";
 import Lotto from "../model/Lotto.js";
 
 export default class WinningNumbersInput extends Component {
-  template() {
+  mainTemplate() {
     return `<label class="flex-auto d-inline-block mb-3"
         >지난 주 당첨번호 6개와 보너스 넘버 1개를 입력해주세요.</label
       >
