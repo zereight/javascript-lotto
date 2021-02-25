@@ -1,20 +1,69 @@
 import { $, $$ } from '../utils/dom.js';
-import { lottoManager } from './App.js';
+import Component from '../core/Component.js';
+import { store } from './App.js';
 
-export default class RewardModalDisplay {
-  constructor(props) {
-    this.props = props;
-    this.setup();
-    this.selectDOM();
-    this.bindEvent();
+export default class RewardModalDisplay extends Component {
+  mainTemplate() {
+    return `
+      <div class="modal-inner p-10">
+        <div class="modal-close">
+          <svg viewbox="0 0 40 40">
+            <path class="close-x" d="M 10,10 L 30,30 M 30,10 L 10,30" />
+          </svg>
+        </div>
+
+        <h2 class="text-center">🏆 당첨 통계 🏆</h2>
+        <div class="d-flex justify-center">
+          <table class="result-table border-collapse border border-black">
+            <thead>
+              <tr class="text-center">
+                <th class="p-3">일치 갯수</th>
+                <th class="p-3">당첨금</th>
+                <th class="p-3">당첨 갯수</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center">
+                <td class="p-3">3개</td>
+                <td class="p-3">5,000</td>
+                <td data-td="FIFTH" class="p-3">n개</td>
+              </tr>
+              <tr class="text-center">
+                <td class="p-3">4개</td>
+                <td class="p-3">50,000</td>
+                <td data-td="FOURTH" class="p-3">n개</td>
+              </tr>
+              <tr class="text-center">
+                <td class="p-3">5개</td>
+                <td class="p-3">1,500,000</td>
+                <td data-td="THIRD" class="p-3">n개</td>
+              </tr>
+              <tr class="text-center">
+                <td class="p-3">5개 + 보너스볼</td>
+                <td class="p-3">30,000,000</td>
+                <td data-td="SECOND" class="p-3">n개</td>
+              </tr>
+              <tr class="text-center">
+                <td class="p-3">6개</td>
+                <td class="p-3">2,000,000,000</td>
+                <td data-td="FIRST" class="p-3">n개</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p data-p="profit" class="text-center font-bold">당신의 총 수익률은 %입니다.</p>
+        <div class="d-flex justify-center mt-5">
+          <button id="restart-btn" ype="button" class="btn btn-cyan">다시 시작하기</button>
+        </div>
+      </div>
+    `;
   }
 
   setup() {
-    lottoManager.subscribe(this.render.bind(this));
+    store.subscribe(this.render.bind(this));
   }
 
   selectDOM() {
-    this.$target = $('.modal');
     this.$restartButton = $('#restart-btn');
     this.$winningCountTexts = $$('[data-td]');
     this.$profitText = $('[data-p=profit]');
@@ -31,7 +80,9 @@ export default class RewardModalDisplay {
   }
 
   onRestart() {
-    lottoManager.resetState();
+    store.dispatch({
+      type: 'RESTART',
+    });
   }
 
   onClickOutsideModal(e) {
@@ -49,17 +100,30 @@ export default class RewardModalDisplay {
     this.$target.classList.remove('open');
   }
 
-  render() {
-    if (Object.keys(lottoManager.winningCount).length !== 0) {
+  render(prevStates, states) {
+    //fail case
+    if (states === undefined) {
+      this.$target.innerHTML = this.mainTemplate();
+      return;
+    }
+
+    // success case
+    if (prevStates.winningCount !== states.winningCount) {
+      const getWinningCountText = key =>
+        Object.keys(states.winningCount).length === 0
+          ? '0개'
+          : `${states.winningCount[key]}개`;
+
       this.$winningCountTexts.forEach($winningCountText => {
         const key = $winningCountText.getAttribute('data-td');
-        $winningCountText.textContent = `${lottoManager.winningCount[key]}개`;
+        $winningCountText.textContent = getWinningCountText(key);
       });
-      this.$profitText.textContent = `당신의 총 수익률은 ${lottoManager.calculateProfitMargin()}% 입니다.`;
-
-      this.onModalShow();
-    } else {
-      this.onModalClose();
     }
+
+    if (prevStates.profit !== states.profit) {
+      this.$profitText.textContent = `당신의 총 수익률은 ${states.profit}% 입니다.`;
+    }
+
+    states.profit === 0 ? this.onModalClose() : this.onModalShow();
   }
 }

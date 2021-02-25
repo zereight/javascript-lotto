@@ -1,29 +1,28 @@
 import { $, clearInputValue } from '../utils/dom.js';
-import { LOTTO } from '../utils/constants.js';
-import { mod, divide } from '../utils/common.js';
+import { store } from './App.js';
+import { validatePurchaseInputValue } from '../redux/reducer.js';
+import { divide, mod } from '../utils/common.js';
 import { GUIDE_MESSAGE } from '../utils/message.js';
-import LottoManager from '../model/LottoManager.js';
-import { lottoManager } from './App.js';
+import { LOTTO } from '../utils/constants.js';
+import Component from '../core/Component.js';
 
-export default class LottoPurchaseInput {
-  constructor(props) {
-    this.props = props;
-
-    this.setup();
-    this.selectDOM();
-    this.bindEvent();
+export default class LottoPurchaseInput extends Component {
+  mainTemplate() {
+    return `
+    <div class="d-flex flex-col">
+      <label class="mb-2 d-inline-block">구입할 금액을 입력해주세요.
+      </label>
+      <div class="d-flex">
+        <input id="lotto-purchase-input" type="number" class="w-100 mr-2 pl-2" placeholder="구입 금액" />
+        <button id="lotto-purchase-btn" type="button" class="btn btn-cyan" disabled>확인</button>
+      </div>
+    </div>
+    <p data-section="purchaseInputMessage" class="text-xs text-center"></p>
+    `;
   }
 
   setup() {
-    lottoManager.subscribe(this.clear.bind(this));
-  }
-
-  clear() {
-    if (lottoManager.lottos.length === 0) {
-      clearInputValue(this.$purchaseInput);
-      this.$purchaseInput.disabled = false;
-      this.$purchaseButton.disabled = true;
-    }
+    store.subscribe(this.render.bind(this));
   }
 
   selectDOM() {
@@ -50,14 +49,19 @@ export default class LottoPurchaseInput {
   onSubmit(e) {
     e.preventDefault();
     if (this.$purchaseButton.disabled) return;
-    this.onPurchaseLotto();
-    this.$purchaseInputMessage.textContent = '';
+    store.dispatch({
+      type: 'UPDATE_PAYMENT',
+      props: {
+        payment: Number(this.$purchaseInput.value),
+      },
+    });
+    store.dispatch({
+      type: 'CREATE_LOTTOS',
+    });
   }
 
   onChangeInput(e) {
-    const [text, result] = LottoManager.validatePurchaseInputValue(
-      e.target.value,
-    );
+    const [text, result] = validatePurchaseInputValue(e.target.value);
     this.$purchaseInputMessage.textContent = text;
     if (result === 'success') {
       this.$purchaseInputMessage.style.color = 'green';
@@ -68,15 +72,29 @@ export default class LottoPurchaseInput {
     }
   }
 
-  onPurchaseLotto() {
-    const purchaseInputValue = this.$purchaseInput.value;
-    const payment = Number(purchaseInputValue);
+  render(prevStates, states) {
+    //fail case
+    if (states === undefined) {
+      this.$target.innerHTML = this.mainTemplate();
+      return;
+    }
 
-    const lottoCount = divide(payment, LOTTO.PRICE);
-    const remainingMoney = mod(payment, LOTTO.PRICE);
-    alert(GUIDE_MESSAGE.PAYMENT_RESULT_MESSAGE(lottoCount, remainingMoney));
-    this.$purchaseInput.disabled = true;
-    this.$purchaseButton.disabled = true;
-    lottoManager.createLottos(lottoCount);
+    if (states.payment === 0) {
+      clearInputValue(this.$purchaseInput);
+      this.$purchaseInput.disabled = false;
+      this.$purchaseButton.disabled = true;
+      this.$purchaseInputMessage.textContent = '';
+      return;
+    }
+
+    // success case
+    if (prevStates.payment !== states.payment) {
+      const lottoCount = divide(states.payment, LOTTO.PRICE);
+      const remainingMoney = mod(states.payment, LOTTO.PRICE);
+      alert(GUIDE_MESSAGE.PAYMENT_RESULT_MESSAGE(lottoCount, remainingMoney));
+      this.$purchaseInput.disabled = true;
+      this.$purchaseButton.disabled = true;
+      this.$purchaseInputMessage.textContent = '';
+    }
   }
 }
