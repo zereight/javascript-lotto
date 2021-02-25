@@ -3,9 +3,10 @@ import { store } from './App.js';
 import { divide, mod } from '../utils/common.js';
 import { ERROR_MESSAGE, GUIDE_MESSAGE } from '../utils/message.js';
 import { LOTTO } from '../utils/constants.js';
-import Component from '../core/Component.js';
 import { createLottos, updatePayment } from '../redux/action.js';
+import Component from '../core/Component.js';
 import Button from './Button/Button.js';
+import Input from './Input/Input.js';
 
 export default class LottoPurchaseInput extends Component {
   mainTemplate() {
@@ -14,7 +15,12 @@ export default class LottoPurchaseInput extends Component {
       <label class="mb-2 d-inline-block">구입할 금액을 입력해주세요.
       </label>
       <div class="d-flex">
-        <input id="lotto-purchase-input" type="number" class="w-100 mr-2 pl-2" placeholder="구입 금액" />
+        ${new Input({
+          id: 'lotto-purchase-input',
+          classes: ['w-100', 'mr-2', 'pl-2'],
+          type: 'number',
+          placeholder: '구입 금액',
+        }).mainTemplate()}
         ${new Button({
           id: 'lotto-purchase-btn',
           type: 'button',

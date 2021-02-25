@@ -6,6 +6,7 @@ import { $, $$, clearInputValue } from '../utils/dom.js';
 import { ERROR_MESSAGE } from '../utils/message.js';
 import { store } from './App.js';
 import Button from './Button/Button.js';
+import Input from './Input/Input.js';
 
 export default class WinningNumbersInput extends Component {
   mainTemplate() {
@@ -16,18 +17,39 @@ export default class WinningNumbersInput extends Component {
               <div class="winning-number-container d-flex flex-col flex-grow">
                   <h4 class="mt-0 mb-3 text-center">당첨 번호</h4>
                   <div>
-                    <input type="number" class="winning-number mx-1 text-center" />
-                    <input type="number" class="winning-number mx-1 text-center" />
-                    <input type="number" class="winning-number mx-1 text-center" />
-                    <input type="number" class="winning-number mx-1 text-center" />
-                    <input type="number" class="winning-number mx-1 text-center" />
-                    <input type="number" class="winning-number mx-1 text-center" />
+                  ${new Input({
+                    type: 'number',
+                    classes: ['winning-number', 'mx-1', 'text-center'],
+                  }).mainTemplate()}
+                  ${new Input({
+                    type: 'number',
+                    classes: ['winning-number', 'mx-1', 'text-center'],
+                  }).mainTemplate()}
+                  ${new Input({
+                    type: 'number',
+                    classes: ['winning-number', 'mx-1', 'text-center'],
+                  }).mainTemplate()}
+                  ${new Input({
+                    type: 'number',
+                    classes: ['winning-number', 'mx-1', 'text-center'],
+                  }).mainTemplate()}
+                  ${new Input({
+                    type: 'number',
+                    classes: ['winning-number', 'mx-1', 'text-center'],
+                  }).mainTemplate()}
+                  ${new Input({
+                    type: 'number',
+                    classes: ['winning-number', 'mx-1', 'text-center'],
+                  }).mainTemplate()}
                   </div>
               </div>
               <div class="bonus-number-container d-flex flex-col flex-grow">
                 <h4 class="mt-0 mb-3 text-center">보너스 번호</h4>
                 <div class="d-flex justify-center">
-                  <input type="number" class="bonus-number text-center" />
+                ${new Input({
+                  type: 'number',
+                  classes: ['bonus-number', 'text-center'],
+                }).mainTemplate()}
                 </div>
               </div>
             </div>

@@ -11,7 +11,6 @@ export default class Button {
     this.type = type;
     this.text = text;
     this.disabled = disabled;
-    return this.mainTemplate();
   }
 
   mainTemplate() {
