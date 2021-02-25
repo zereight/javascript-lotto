@@ -3,6 +3,7 @@ import Component from '../core/Component.js';
 import { store } from './App.js';
 import { REWARDS } from '../utils/constants.js';
 import { restart } from '../redux/action.js';
+import Button from './Button/Button.js';
 
 export default class RewardModalDisplay extends Component {
   mainTemplate() {
@@ -56,7 +57,12 @@ export default class RewardModalDisplay extends Component {
         </div>
         <p data-p="profit" class="text-center font-bold">당신의 총 수익률은 %입니다.</p>
         <div class="d-flex justify-center mt-5">
-          <button id="restart-btn" ype="button" class="btn btn-cyan">다시 시작하기</button>
+        ${new Button({
+          id: 'restart-btn',
+          type: 'reset',
+          classes: ['btn', 'btn-cyan'],
+          text: '다시 시작하기',
+        }).mainTemplate()}
         </div>
       </div>
     `;

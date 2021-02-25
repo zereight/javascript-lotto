@@ -3,8 +3,8 @@ import LottoDisplay from './LottoDisplay.js';
 import Component from '../core/Component.js';
 import Store from '../redux/store.js';
 import WinningNumbersInput from './WinningNumbersInput.js';
-import { $ } from '../utils/dom.js';
 import RewardModalDisplay from './RewardModalDisplay.js';
+import { $ } from '../utils/dom.js';
 
 // export const lottoManager = new LottoManager([]);
 export const store = new Store();

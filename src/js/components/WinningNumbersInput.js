@@ -5,6 +5,7 @@ import { LOTTO } from '../utils/constants.js';
 import { $, $$, clearInputValue } from '../utils/dom.js';
 import { ERROR_MESSAGE } from '../utils/message.js';
 import { store } from './App.js';
+import Button from './Button/Button.js';
 
 export default class WinningNumbersInput extends Component {
   mainTemplate() {
@@ -32,9 +33,18 @@ export default class WinningNumbersInput extends Component {
             </div>
             <p data-section="winningInputMessage" class="text-xs text-center"></p>
           </div>
-          <button type="button" class="open-result-modal-button mt-5 btn btn-cyan w-100" disabled>
-            결과 확인하기
-          </button>
+          ${new Button({
+            type: 'button',
+            classes: [
+              'open-result-modal-button',
+              'mt-5',
+              'btn',
+              'btn-cyan',
+              'w-100',
+            ],
+            disabled: true,
+            text: '결과 확인하기',
+          }).mainTemplate()}
     `;
   }
 

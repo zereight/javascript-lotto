@@ -5,6 +5,7 @@ import { ERROR_MESSAGE, GUIDE_MESSAGE } from '../utils/message.js';
 import { LOTTO } from '../utils/constants.js';
 import Component from '../core/Component.js';
 import { createLottos, updatePayment } from '../redux/action.js';
+import Button from './Button/Button.js';
 
 export default class LottoPurchaseInput extends Component {
   mainTemplate() {
@@ -14,7 +15,13 @@ export default class LottoPurchaseInput extends Component {
       </label>
       <div class="d-flex">
         <input id="lotto-purchase-input" type="number" class="w-100 mr-2 pl-2" placeholder="구입 금액" />
-        <button id="lotto-purchase-btn" type="button" class="btn btn-cyan" disabled>확인</button>
+        ${new Button({
+          id: 'lotto-purchase-btn',
+          type: 'button',
+          classes: ['btn', 'btn-cyan'],
+          disabled: true,
+          text: '확인',
+        }).mainTemplate()}
       </div>
     </div>
     <p data-section="purchaseInputMessage" class="text-xs text-center"></p>
