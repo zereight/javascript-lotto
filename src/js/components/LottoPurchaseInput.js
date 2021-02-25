@@ -51,6 +51,18 @@ export default class LottoPurchaseInput extends Component {
     store.dispatch(createLottos());
   }
 
+  onChangeInput(e) {
+    const [text, result] = this.validatePurchaseInputValue(e.target.value);
+    this.$purchaseInputMessage.textContent = text;
+    if (result === 'success') {
+      this.$purchaseInputMessage.style.color = 'green';
+      this.$purchaseButton.disabled = false;
+    } else if (result === 'error') {
+      this.$purchaseInputMessage.style.color = 'red';
+      this.$purchaseButton.disabled = true;
+    }
+  }
+
   validatePurchaseInputValue = number => {
     const payment = Number(number);
     if (!Number.isInteger(payment)) {
@@ -63,18 +75,6 @@ export default class LottoPurchaseInput extends Component {
 
     return [ERROR_MESSAGE.VALID_INPUT_NUMBER, 'success'];
   };
-
-  onChangeInput(e) {
-    const [text, result] = this.validatePurchaseInputValue(e.target.value);
-    this.$purchaseInputMessage.textContent = text;
-    if (result === 'success') {
-      this.$purchaseInputMessage.style.color = 'green';
-      this.$purchaseButton.disabled = false;
-    } else if (result === 'error') {
-      this.$purchaseInputMessage.style.color = 'red';
-      this.$purchaseButton.disabled = true;
-    }
-  }
 
   render(prevStates, states) {
     //fail case

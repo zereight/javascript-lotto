@@ -18,7 +18,6 @@ import {
   RESTART,
   UPDATE_PAYMENT,
 } from '../redux/actionType.js';
-import { store } from '../components/App.js';
 
 export const payment = (state = 0, { type, payload = {} }) => {
   switch (type) {
@@ -34,10 +33,10 @@ export const payment = (state = 0, { type, payload = {} }) => {
   }
 };
 
-export const lottos = (state = [], { type }) => {
+export const lottos = (state = [], payment, { type }) => {
   switch (type) {
     case CREATE_LOTTOS:
-      const lottoCount = Math.floor(store.getStates().payment / LOTTO.PRICE);
+      const lottoCount = Math.floor(payment / LOTTO.PRICE);
       const generateLottoNumbers = () => {
         const lottoNumbers = new Set();
         while (lottoNumbers.size < LOTTO.LENGTH) {
@@ -45,8 +44,10 @@ export const lottos = (state = [], { type }) => {
         }
         return [...lottoNumbers];
       };
-      return Array.from({ length: lottoCount }, () => generateLottoNumbers());
-
+      const lottos = Array.from({ length: lottoCount }, () =>
+        generateLottoNumbers(),
+      );
+      return lottos;
     case RESTART:
       return [];
     default:
@@ -54,7 +55,7 @@ export const lottos = (state = [], { type }) => {
   }
 };
 
-export const winningCount = (state, { type, payload }) => {
+export const winningCount = (state, lottos, { type, payload = {} }) => {
   const getMatchedCount = (winningNumbers, numbers) => {
     let count = 0;
     numbers.forEach(number => {
@@ -81,7 +82,6 @@ export const winningCount = (state, { type, payload }) => {
   switch (type) {
     case DECIDE_WINNER:
       const { winningNumbers, bonusNumber } = payload;
-      const lottos = store.getStates().lottos;
       const winningCountTemp = {};
       let i = 0;
       Object.assign(
@@ -116,7 +116,10 @@ export const profit = (state, lottoCount, winningCount, { type }) => {
         (currProfit, key) => currProfit + REWARDS[key] * winningCount[key],
         0,
       );
-      const profitRatio = ((totalProfit - investment) / investment) * 100;
+      const profitRatio = (
+        ((totalProfit - investment) / investment) *
+        100
+      ).toFixed(2);
       return profitRatio;
 
     case RESTART:

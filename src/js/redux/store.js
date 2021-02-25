@@ -36,8 +36,12 @@ export default class Store {
   reduce(states, action) {
     return {
       payment: reducers.payment(states.payment, action),
-      lottos: reducers.lottos(states.lottos, action),
-      winningCount: reducers.winningCount(states.winningCount, action),
+      lottos: reducers.lottos(states.lottos, states.payment, action),
+      winningCount: reducers.winningCount(
+        states.winningCount,
+        states.lottos,
+        action,
+      ),
       profit: reducers.profit(
         states.profit,
         states.lottos.length,
@@ -62,7 +66,6 @@ export default class Store {
   dispatch(action) {
     this.prevStates = this.states;
     this.states = this.reduce(this.states, action);
-    console.log(this.states);
     this.notifySubscribers();
   }
 }

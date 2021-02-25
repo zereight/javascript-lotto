@@ -10,6 +10,7 @@ import {
   CALCULATE_PROFIT,
   CREATE_LOTTOS,
   DECIDE_WINNER,
+  RESTART,
   UPDATE_PAYMENT,
 } from './actionType.js';
 
@@ -43,5 +44,12 @@ export const calculateProfit = () => {
   'use strict';
   return {
     type: CALCULATE_PROFIT,
+  };
+};
+
+export const restart = () => {
+  'use strict';
+  return {
+    type: RESTART,
   };
 };

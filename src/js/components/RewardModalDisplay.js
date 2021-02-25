@@ -2,6 +2,7 @@ import { $, $$ } from '../utils/dom.js';
 import Component from '../core/Component.js';
 import { store } from './App.js';
 import { REWARDS } from '../utils/constants.js';
+import { restart } from '../redux/action.js';
 
 export default class RewardModalDisplay extends Component {
   mainTemplate() {
@@ -82,15 +83,11 @@ export default class RewardModalDisplay extends Component {
   }
 
   onRestart() {
-    store.dispatch({
-      type: 'RESTART',
-    });
+    store.dispatch(restart());
   }
 
   onClickOutsideModal(e) {
-    if (e.target.closest('.modal-inner')) {
-      return;
-    }
+    if (e.target.closest('.modal-inner')) return;
     this.onModalClose();
   }
 
