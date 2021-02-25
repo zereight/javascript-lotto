@@ -1,6 +1,9 @@
 import Component from '../core/Component.js';
-import { validateWinningNumbersInputValue } from '../redux/reducer.js';
+import { calculateProfit, decideWinner } from '../redux/action.js';
+import { isEmptyValue, isInRange } from '../utils/common.js';
+import { LOTTO } from '../utils/constants.js';
 import { $, $$, clearInputValue } from '../utils/dom.js';
+import { ERROR_MESSAGE } from '../utils/message.js';
 import { store } from './App.js';
 
 export default class WinningNumbersInput extends Component {
@@ -49,12 +52,28 @@ export default class WinningNumbersInput extends Component {
   onMoveCursorToNextInput({ target }) {
     if (target.value.length > 1) {
       target.value = target.value.slice(0, 2);
-      if (target.nextElementSibling) target.nextElementSibling.focus();
-      else {
-        this.$bonusNumberInput.focus();
-      }
+      (target.nextElementSibling
+        ? target.nextElementSibling
+        : this.$bonusNumberInput
+      ).focus();
     }
   }
+
+  validateWinningNumbersInputValue = (winningNumbers, bonusNumber) => {
+    const numbers = [...winningNumbers, bonusNumber].map(Number);
+    if (winningNumbers.some(isEmptyValue) || isEmptyValue(bonusNumber)) {
+      return [ERROR_MESSAGE.EMPTY_INPUT_NUMBER, 'error'];
+    }
+    if (
+      !numbers.every(number => isInRange(number, LOTTO.MIN_NUM, LOTTO.MAX_NUM))
+    ) {
+      return [ERROR_MESSAGE.OUT_OF_RANGE, 'error'];
+    }
+    if (new Set(numbers).size !== numbers.length) {
+      return [ERROR_MESSAGE.DUPLICATED_NUMBER, 'error'];
+    }
+    return [ERROR_MESSAGE.VALID_INPUT_NUMBER, 'success'];
+  };
 
   onKeyUpNumberInput(e) {
     this.onMoveCursorToNextInput(e);
@@ -65,7 +84,7 @@ export default class WinningNumbersInput extends Component {
       this.$bonusNumberInput.value === ''
         ? ''
         : Number(this.$bonusNumberInput.value);
-    const [text, result] = validateWinningNumbersInputValue(
+    const [text, result] = this.validateWinningNumbersInputValue(
       winningNumbers,
       bonusNumber,
     );
@@ -83,18 +102,10 @@ export default class WinningNumbersInput extends Component {
   onClickResultButton() {
     const winningNumbers = this.$winningNumberInputs.map(({ value }) => value);
     const bonusNumber = this.$bonusNumberInput.value;
-    store.dispatch({
-      type: 'DECIDE_WINNER',
-      props: {
-        winningNumbers: winningNumbers.map(Number),
-        bonusNumber: Number(bonusNumber),
-      },
-    });
-    store.dispatch({
-      type: 'CALCULATE_PROFIT',
-    });
-
-    // decideWinners(winningNumbers.map(Number), Number(bonusNumber));
+    store.dispatch(
+      decideWinner(winningNumbers.map(Number), Number(bonusNumber)),
+    );
+    store.dispatch(calculateProfit());
   }
 
   bindEvent() {

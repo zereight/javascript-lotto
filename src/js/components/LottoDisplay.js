@@ -43,8 +43,8 @@ export default class LottoDisplay extends Component {
     });
   }
 
-  createTotalLottoCountHTML() {
-    return `총 ${store.getStates().lottos.length}개를 구매하였습니다.`;
+  createTotalLottoCountHTML(lottoCount) {
+    return `총 ${lottoCount}개를 구매하였습니다.`;
   }
 
   createLottoHTML(numbers) {
@@ -72,7 +72,9 @@ export default class LottoDisplay extends Component {
     // success case
     if (prevStates.lottos !== states.lottos) {
       this.$target.classList.remove('d-none');
-      this.$lottoCount.innerHTML = this.createTotalLottoCountHTML();
+      this.$lottoCount.innerHTML = this.createTotalLottoCountHTML(
+        states.lottos.length,
+      );
       this.$lottoDisplayArea.innerHTML = states.lottos
         .map(lottoNumbers => this.createLottoHTML(lottoNumbers))
         .join('');

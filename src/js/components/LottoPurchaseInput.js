@@ -1,10 +1,10 @@
 import { $, clearInputValue } from '../utils/dom.js';
 import { store } from './App.js';
-import { validatePurchaseInputValue } from '../redux/reducer.js';
 import { divide, mod } from '../utils/common.js';
-import { GUIDE_MESSAGE } from '../utils/message.js';
+import { ERROR_MESSAGE, GUIDE_MESSAGE } from '../utils/message.js';
 import { LOTTO } from '../utils/constants.js';
 import Component from '../core/Component.js';
+import { createLottos, updatePayment } from '../redux/action.js';
 
 export default class LottoPurchaseInput extends Component {
   mainTemplate() {
@@ -33,13 +33,11 @@ export default class LottoPurchaseInput extends Component {
   }
 
   bindEvent() {
-    this.$purchaseButton.addEventListener('click', this.onPurchaseLotto);
-
     this.$purchaseInput.addEventListener(
       'keyup',
       this.onChangeInput.bind(this),
     );
-
+    this.$purchaseButton.addEventListener('click', this.onSubmit.bind(this));
     this.$lottoPurchaseInputContainer.addEventListener(
       'submit',
       this.onSubmit.bind(this),
@@ -49,19 +47,25 @@ export default class LottoPurchaseInput extends Component {
   onSubmit(e) {
     e.preventDefault();
     if (this.$purchaseButton.disabled) return;
-    store.dispatch({
-      type: 'UPDATE_PAYMENT',
-      props: {
-        payment: Number(this.$purchaseInput.value),
-      },
-    });
-    store.dispatch({
-      type: 'CREATE_LOTTOS',
-    });
+    store.dispatch(updatePayment(Number(this.$purchaseInput.value)));
+    store.dispatch(createLottos());
   }
 
+  validatePurchaseInputValue = number => {
+    const payment = Number(number);
+    if (!Number.isInteger(payment)) {
+      return [ERROR_MESSAGE.NOT_INTEGER_NUMBER, 'error'];
+    }
+
+    if (payment < LOTTO.PRICE) {
+      return [ERROR_MESSAGE.PAYMENT_AMOUNT, 'error'];
+    }
+
+    return [ERROR_MESSAGE.VALID_INPUT_NUMBER, 'success'];
+  };
+
   onChangeInput(e) {
-    const [text, result] = validatePurchaseInputValue(e.target.value);
+    const [text, result] = this.validatePurchaseInputValue(e.target.value);
     this.$purchaseInputMessage.textContent = text;
     if (result === 'success') {
       this.$purchaseInputMessage.style.color = 'green';

@@ -1,20 +1,15 @@
 /*
-    state를 관리하는 store,
+    스토어 규칙
+    state를 관리하는 역할
     state는 읽기 전용이어야 한다.
     action에 의해서만 변경됨
     reducer는 only function 이어야 함.
     리덕스에서는 한 어플리케이션당 하나의 스토어를 만든다.
 */
 
-import {
-  calculateProfitMargin,
-  decideWinners,
-  updateLottos,
-  updatePayment,
-} from './reducer.js';
-
+import * as reducers from './reducer.js';
 export default class Store {
-  static singletonStore = null; // 리덕스에서는 한 어플리케이션당 하나의 store만 존재하기 떄문
+  static singletonStore = null; // 리덕스에서는 한 어플리케이션당 하나의 store만 존재하기 떄문에 싱글톤 구현
 
   constructor() {
     if (Store.singletonStore) return Store.singletonStore;
@@ -40,10 +35,10 @@ export default class Store {
 
   reduce(states, action) {
     return {
-      payment: updatePayment(states.payment, action),
-      lottos: updateLottos(states.lottos, action),
-      winningCount: decideWinners(states.winningCount, action),
-      profit: calculateProfitMargin(
+      payment: reducers.payment(states.payment, action),
+      lottos: reducers.lottos(states.lottos, action),
+      winningCount: reducers.winningCount(states.winningCount, action),
+      profit: reducers.profit(
         states.profit,
         states.lottos.length,
         states.winningCount,
@@ -67,6 +62,7 @@ export default class Store {
   dispatch(action) {
     this.prevStates = this.states;
     this.states = this.reduce(this.states, action);
+    console.log(this.states);
     this.notifySubscribers();
   }
 }

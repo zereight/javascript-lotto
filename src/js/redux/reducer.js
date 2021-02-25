@@ -1,10 +1,16 @@
-import { LOTTO } from '../utils/constants.js';
-import {
-  generateRandomNumber,
-  isEmptyValue,
-  isInRange,
-} from '../utils/common.js';
-import { ERROR_MESSAGE } from '../utils/message.js';
+/*
+    리듀서 규칙
+    식별되지 않은 모든 상태에 대해서는 첫 인수로 주어진 state를 그대로 반환해야 합니다
+    state가 undefined로 주어지면 반드시 해당 리듀서의 초기 상태를 반환해야 합니다
+    반드시 리듀서가 undefined를 상태로 받더라도 제대로 작동하는지 확인하세요.
+    상태가 평범한 객체라면, 절대 변경하지 않도록 하세요! 
+     예를 들어 리듀서에서 Object.assign(state, newData) 같은 것을 반환하는 대신 Object.assign({}, state, newData)를 반환하세요
+     이를 통해 이전 상태를 덮어쓰지 않을 수 있습니다.
+    객체 확산 연산자 제안을 사용한다면 return { ...state, ...newData }처럼 쓸 수도 있습니다.
+ */
+
+import { LOTTO, REWARDS } from '../utils/constants.js';
+import { generateRandomNumber } from '../utils/common.js';
 import {
   CALCULATE_PROFIT,
   CREATE_LOTTOS,
@@ -14,63 +20,21 @@ import {
 } from '../redux/actionType.js';
 import { store } from '../components/App.js';
 
-const getMatchedCount = (winningNumbers, numbers) => {
-  let count = 0;
-  numbers.forEach(number => {
-    if (winningNumbers.includes(number)) count++;
-  });
-  return count;
-};
-
-export const validateWinningNumbersInputValue = (
-  winningNumbers,
-  bonusNumber,
-) => {
-  const numbers = [...winningNumbers, bonusNumber].map(Number);
-
-  if (winningNumbers.some(isEmptyValue) || isEmptyValue(bonusNumber)) {
-    return [ERROR_MESSAGE.EMPTY_INPUT_NUMBER, 'error'];
-  }
-
-  if (!numbers.every(number => isInRange(number))) {
-    return [ERROR_MESSAGE.OUT_OF_RANGE, 'error'];
-  }
-
-  if (new Set(numbers).size !== numbers.length) {
-    return [ERROR_MESSAGE.DUPLICATED_NUMBER, 'error'];
-  }
-
-  return [ERROR_MESSAGE.VALID_INPUT_NUMBER, 'success'];
-};
-
-export const validatePurchaseInputValue = number => {
-  const payment = Number(number);
-  if (!Number.isInteger(payment)) {
-    return [ERROR_MESSAGE.NOT_INTEGER_NUMBER, 'error'];
-  }
-
-  if (payment < LOTTO.PRICE) {
-    return [ERROR_MESSAGE.PAYMENT_AMOUNT, 'error'];
-  }
-
-  return [ERROR_MESSAGE.VALID_INPUT_NUMBER, 'success'];
-};
-
-export const updatePayment = (payment, { type, props = {} }) => {
+export const payment = (state = 0, { type, payload = {} }) => {
   switch (type) {
     case UPDATE_PAYMENT:
-      if (props.payment) {
-        return props.payment;
+      if (payload.payment) {
+        return payload.payment;
       }
-      return payment;
+      return state;
     case RESTART:
       return 0;
     default:
-      return payment;
+      return state;
   }
 };
 
-export const updateLottos = (lottos, { type }) => {
+export const lottos = (state = [], { type }) => {
   switch (type) {
     case CREATE_LOTTOS:
       const lottoCount = Math.floor(store.getStates().payment / LOTTO.PRICE);
@@ -86,69 +50,70 @@ export const updateLottos = (lottos, { type }) => {
     case RESTART:
       return [];
     default:
-      return lottos;
+      return state;
   }
 };
 
-export const decideWinners = (winningCount, { type, props }) => {
+export const winningCount = (state, { type, payload }) => {
+  const getMatchedCount = (winningNumbers, numbers) => {
+    let count = 0;
+    numbers.forEach(number => {
+      if (winningNumbers.includes(number)) count++;
+    });
+    return count;
+  };
+
   const countWinner = (winningNumbers, bonusNumber, lottoNumbers) => {
     const count = getMatchedCount(winningNumbers, lottoNumbers);
     if (count === 6) {
-      winningCount[`FIRST`]++;
+      return 1;
     } else if (count === 5 && lottoNumbers.includes(bonusNumber)) {
-      winningCount[`SECOND`]++;
+      return 2;
     } else if (count === 5) {
-      winningCount[`THIRD`]++;
+      return 3;
     } else if (count === 4) {
-      winningCount[`FOURTH`]++;
+      return 4;
     } else if (count === 3) {
-      winningCount[`FIFTH`]++;
+      return 5;
     }
   };
 
   switch (type) {
     case DECIDE_WINNER:
-      const { winningNumbers, bonusNumber } = props;
+      const { winningNumbers, bonusNumber } = payload;
       const lottos = store.getStates().lottos;
-      winningCount = Object.seal({
-        FIRST: 0,
-        SECOND: 0,
-        THIRD: 0,
-        FOURTH: 0,
-        FIFTH: 0,
-      });
+      const winningCountTemp = {};
+      let i = 0;
+      Object.assign(
+        winningCountTemp,
+        Object.seal({
+          ['rank' + ++i]: 0,
+          ['rank' + ++i]: 0,
+          ['rank' + ++i]: 0,
+          ['rank' + ++i]: 0,
+          ['rank' + ++i]: 0,
+        }),
+      );
 
       lottos.forEach(lottoNumbers => {
-        countWinner(winningNumbers, bonusNumber, lottoNumbers);
+        const rank = countWinner(winningNumbers, bonusNumber, lottoNumbers);
+        rank && winningCountTemp[`rank${rank}`]++;
       });
 
-      return winningCount;
+      return winningCountTemp;
     case RESTART:
       return {};
     default:
-      return winningCount;
+      return state;
   }
 };
 
-export const calculateProfitMargin = (
-  profit,
-  lottoCount,
-  winningCount,
-  { type },
-) => {
-  const rewards = Object.freeze({
-    FIRST: 2000000000,
-    SECOND: 300000000,
-    THIRD: 1500000,
-    FOURTH: 50000,
-    FIFTH: 5000,
-  });
-
+export const profit = (state, lottoCount, winningCount, { type }) => {
   switch (type) {
     case CALCULATE_PROFIT:
       const investment = lottoCount * LOTTO.PRICE;
       const totalProfit = Object.keys(winningCount).reduce(
-        (currProfit, key) => currProfit + rewards[key] * winningCount[key],
+        (currProfit, key) => currProfit + REWARDS[key] * winningCount[key],
         0,
       );
       const profitRatio = ((totalProfit - investment) / investment) * 100;
@@ -158,6 +123,6 @@ export const calculateProfitMargin = (
       return 0;
 
     default:
-      return profit;
+      return state;
   }
 };

@@ -1,9 +1,11 @@
 import { $, $$ } from '../utils/dom.js';
 import Component from '../core/Component.js';
 import { store } from './App.js';
+import { REWARDS } from '../utils/constants.js';
 
 export default class RewardModalDisplay extends Component {
   mainTemplate() {
+    let i = 6;
     return `
       <div class="modal-inner p-10">
         <div class="modal-close">
@@ -25,28 +27,28 @@ export default class RewardModalDisplay extends Component {
             <tbody>
               <tr class="text-center">
                 <td class="p-3">3개</td>
-                <td class="p-3">5,000</td>
-                <td data-td="FIFTH" class="p-3">n개</td>
+                <td class="p-3">${REWARDS[`rank${--i}`]}</td>
+                <td data-td="rank${i}" class="p-3">0개</td>
               </tr>
               <tr class="text-center">
                 <td class="p-3">4개</td>
-                <td class="p-3">50,000</td>
-                <td data-td="FOURTH" class="p-3">n개</td>
+                <td class="p-3">${REWARDS[`rank${--i}`]}</td>
+                <td data-td="rank${i}" class="p-3">0개</td>
               </tr>
               <tr class="text-center">
                 <td class="p-3">5개</td>
-                <td class="p-3">1,500,000</td>
-                <td data-td="THIRD" class="p-3">n개</td>
+                <td class="p-3">${REWARDS[`rank${--i}`]}</td>
+                <td data-td="rank${i}" class="p-3">0개</td>
               </tr>
               <tr class="text-center">
                 <td class="p-3">5개 + 보너스볼</td>
-                <td class="p-3">30,000,000</td>
-                <td data-td="SECOND" class="p-3">n개</td>
+                <td class="p-3">${REWARDS[`rank${--i}`]}</td>
+                <td data-td="rank${i}" class="p-3">0개</td>
               </tr>
               <tr class="text-center">
                 <td class="p-3">6개</td>
-                <td class="p-3">2,000,000,000</td>
-                <td data-td="FIRST" class="p-3">n개</td>
+                <td class="p-3">${REWARDS[`rank${--i}`]}</td>
+                <td data-td="rank${i}" class="p-3">0개</td>
               </tr>
             </tbody>
           </table>
